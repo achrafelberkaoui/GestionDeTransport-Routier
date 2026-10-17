@@ -27,7 +27,7 @@ router.get(
 router.get(
   "/:id",
   authenticate,
-  authorize("admin"),
+  authorize("driver","admin"),
   trajetController.getTrajetById,
 );
 router.put(

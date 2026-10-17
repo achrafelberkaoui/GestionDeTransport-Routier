@@ -11,6 +11,12 @@ const rateAuthLimiter = require("../../middleware/rateAuthLimiteMiddleware");
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  res.json({
+    message: "Fleet Management API is running",
+    version: "1.0",
+  });
+});
 router.use("/auth", rateAuthLimiter, authRoutes);
 router.use("/users", userRoutes);
 router.use("/camions", camionRoutes);

@@ -17,7 +17,6 @@ const authenticate = async (req, res, next) => {
         message: "Token required",
       });
     }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded;

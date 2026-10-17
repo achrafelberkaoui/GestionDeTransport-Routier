@@ -24,7 +24,7 @@ const createTrajet = async (dataTrajet) => {
     statut: {
       $in: ["planifie", "en_cours"],
     },
-  });
+  });//checkDate
 
   if (trajetCamionActif) {
     throw new Error("Camion already has an active trajet");

@@ -24,8 +24,6 @@ const createPneu = async (pneuData) => {
     throw new Error("Pneu reference already exists");
   }
 
-  // Vérifier le camion seulement
-  // si un camion est fourni
   if (camion) {
     const existingCamion = await Camion.findById(camion);
 

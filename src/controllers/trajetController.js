@@ -98,14 +98,14 @@ const telechargerPdfTrajet = async (req, res) => {
     if (req.user.role !== "admin") {
       const userId = req.user.id || req.user._id || req.user.userId;
 
-if (!userId || trajet.chauffeur._id.toString() !== userId.toString()) {
-  return res.status(403).json({
-    message: "Vous ne pouvez pas acceder a ce trajet",
-  });
-}
-}
+      if (!userId || trajet.chauffeur._id.toString() !== userId.toString()) {
+        return res.status(403).json({
+          message: "Vous ne pouvez pas acceder a ce trajet",
+        });
+      }
+    }
 
-const pdf = pdfService.genererPdfTrajet(trajet);
+    const pdf = pdfService.genererPdfTrajet(trajet);
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
