@@ -12,11 +12,17 @@ router.get("/", (req, res) => {
   });
 });
 
-  router.get(
-    "/analytics/drivers/eco-performance",
-    authenticate,
-    authorize("admin"),
-    analyticsController.getDriversEcoPerformance,
-  );
+router.get(
+  "/analytics/drivers/eco-performance",
+  authenticate,
+  authorize("admin"),
+  analyticsController.getDriversEcoPerformance,
+);
+router.get(
+  "/analytics/tires/health-matrix",
+  authenticate,
+  authorize("admin"),
+  analyticsController.getTiresHealthMatrix,
+);
 
 module.exports = router;

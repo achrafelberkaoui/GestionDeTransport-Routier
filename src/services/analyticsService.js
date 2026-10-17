@@ -1,3 +1,4 @@
+const Pneu = require("../models/Pneu");
 const Trajet = require("../models/Trajet");
 
 const getDriversEcoPerformance = async () => {
@@ -118,4 +119,65 @@ const getDriversEcoPerformance = async () => {
   ]);
 };
 
-module.exports = { getDriversEcoPerformance };
+const getTiresHealthMatrix = async () => {
+  return Pneu.aggregate([
+    {
+      $match: {
+        etat: { $ne: "a_remplacer" },
+        kilometrageUsure: {
+          $type: "number",
+          $gte: 0,
+        },
+        seuilUsure: {
+          $type: "number",
+          $gte: 0,
+        },
+      },
+    },
+
+    {
+      $addFields: {
+        remainingKm: {
+          $max: [
+            0,
+            {
+              $subtract: ["$seuilUsure", "$kilometrageUsure"],
+            },
+          ],
+        },
+      },
+    },
+
+    {
+      $addFields: {
+        isCritical: {
+          $lt: ["$remainingKm", 5000],
+        },
+      },
+    },
+
+    {
+      $group: {
+        _id: "$camion",
+        reference: {$first: "$reference"},
+        nombrePneus: { $sum: 1 },
+        kilometrageMoyen: { $avg: "$kilometrageUsure" },
+        nombrePneusCritiques: {
+          $sum: {
+            $cond: ["$isCritical", 1, 0],
+          },
+        },
+        budgetEstimeMAD: {
+          $sum: {
+            $cond: ["$isCritical", 3800, 0],
+          },
+        },
+      },
+    },
+  ]);
+};
+
+module.exports = {
+  getDriversEcoPerformance,
+  getTiresHealthMatrix,
+};
