@@ -24,5 +24,11 @@ router.get(
   authorize("admin"),
   analyticsController.getTiresHealthMatrix,
 );
+router.get(
+  "/analytics/trips/financial-esg",
+  authenticate,
+  authorize("admin"),
+  analyticsController.getFinancialEnergetique,
+);
 
 module.exports = router;

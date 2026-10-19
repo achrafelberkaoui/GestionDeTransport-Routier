@@ -159,7 +159,7 @@ const getTiresHealthMatrix = async () => {
     {
       $group: {
         _id: "$camion",
-        reference: {$first: "$reference"},
+        reference: { $first: "$reference" },
         nombrePneus: { $sum: 1 },
         kilometrageMoyen: { $avg: "$kilometrageUsure" },
         nombrePneusCritiques: {
@@ -177,7 +177,95 @@ const getTiresHealthMatrix = async () => {
   ]);
 };
 
+const getFinancialEnergetique = async ({ startDate, endDate } = {}) => {
+  const dateFilter = {};
+
+  if (startDate || endDate) {
+    dateFilter.dateDepart = {};
+
+    if (startDate) {
+      dateFilter.dateDepart.$gte = new Date(startDate);
+    }
+
+    if (endDate) {
+      dateFilter.dateDepart.$lte = new Date(endDate);
+    }
+  }
+
+  return Trajet.aggregate([
+    {
+      $match: {
+        statut: "termine",
+        ...dateFilter,
+        kilometrageArrivee: { $type: "number" },
+        kilometrageDepart: { $type: "number" },
+        carburantConsomme: { $type: "number", $gte: 0 },
+      },
+    },
+
+    {
+      $addFields: {
+        distanceKm: {
+          $subtract: ["$kilometrageArrivee", "$kilometrageDepart"],
+        },
+      },
+    },
+
+    {
+      $match: {
+        distanceKm: { $gt: 0 },
+      },
+    },
+
+    {
+      $group: {
+        _id: {
+          origine: "$origine",
+          destination: "$destination",
+        },
+        nombreTrajets: { $sum: 1 },
+        distanceTotaleKm: { $sum: "$distanceKm" },
+        carburantTotalLitres: { $sum: "$carburantConsomme" },
+      },
+    },
+
+    {
+      $addFields: {
+        consommationMoyenneL100Km: {
+          $multiply: [
+            {
+              $divide: ["$carburantTotalLitres", "$distanceTotaleKm"],
+            },
+            100,
+          ],
+        },
+        emissionsCO2Tonnes: {
+          $divide: [{ $multiply: ["$carburantTotalLitres", 2.68] }, 1000],
+        },
+      },
+    },
+
+    {
+      $project: {
+        _id: 0,
+        origine: "$_id.origine",
+        destination: "$_id.destination",
+        nombreTrajets: 1,
+        distanceTotaleKm: { $round: ["$distanceTotaleKm", 2] },
+        carburantTotalLitres: { $round: ["$carburantTotalLitres", 2] },
+        consommationMoyenneL100Km: {
+          $round: ["$consommationMoyenneL100Km", 2],
+        },
+        emissionsCO2Tonnes: { $round: ["$emissionsCO2Tonnes", 4] },
+      },
+    },
+
+    { $sort: { emissionsCO2Tonnes: -1 } },
+  ]);
+};
+
 module.exports = {
   getDriversEcoPerformance,
   getTiresHealthMatrix,
+  getFinancialEnergetique,
 };
