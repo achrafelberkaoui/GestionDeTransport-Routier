@@ -30,5 +30,11 @@ router.get(
   authorize("admin"),
   analyticsController.getFinancialEnergetique,
 );
+router.get(
+  "/analytics/fleet/utilization-trends",
+  authenticate,
+  authorize("admin"),
+  analyticsController.getFleetUtilizationTrends,
+);
 
 module.exports = router;

@@ -264,8 +264,79 @@ const getFinancialEnergetique = async ({ startDate, endDate } = {}) => {
   ]);
 };
 
+const getFleetUtilizationTrends = async ({ startDate, endDate } = {}) => {
+  const dateFilter = {};
+
+  if (startDate || endDate) {
+    dateFilter.dateDepart = {};
+
+    if (startDate) {
+      dateFilter.dateDepart.$gte = new Date(startDate);
+    }
+
+    if (endDate) {
+      dateFilter.dateDepart.$lte = new Date(endDate);
+    }
+  }
+
+  return Trajet.aggregate([
+    {
+      $match: {
+        statut: "termine",
+        ...dateFilter,
+        dateDepart: { ...dateFilter.dateDepart, $type: "date" },
+        dateArrivee: { $type: "date" },
+        camion: { $ne: null },
+      },
+    },
+
+    {
+      $addFields: {
+        dureeMissionHeures: {
+          $divide: [
+            { $subtract: ["$dateArrivee", "$dateDepart"] },
+            1000 * 60 * 60,
+          ],
+        },
+      },
+    },
+
+    {
+      $match: {
+        dureeMissionHeures: { $gt: 0 },
+      },
+    },
+
+    {
+      $group: {
+        _id: "$camion",
+        nombreMissions: { $sum: 1 },
+        tempsMissionHeures: { $sum: "$dureeMissionHeures" },
+      },
+    },
+
+    {
+      $project: {
+        _id: 0,
+        camion: "$_id",
+        nombreMissions: 1,
+        tempsMissionHeures: {
+          $round: ["$tempsMissionHeures", 2],
+        },
+      },
+    },
+
+    {
+      $sort: {
+        tempsMissionHeures: -1,
+      },
+    },
+  ]);
+};
+
 module.exports = {
   getDriversEcoPerformance,
   getTiresHealthMatrix,
   getFinancialEnergetique,
+  getFleetUtilizationTrends
 };

@@ -76,8 +76,46 @@ const getFinancialEnergetique = async (req, res) => {
   }
 };
 
+const getFleetUtilizationTrends = async (req, res, next) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    if (startDate && Number.isNaN(Date.parse(startDate))) {
+      return res.status(400).json({
+        message: "startDate invalide",
+      });
+    }
+
+    if (endDate && Number.isNaN(Date.parse(endDate))) {
+      return res.status(400).json({
+        message: "endDate invalide",
+      });
+    }
+
+    if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+      return res.status(400).json({
+        message: "startDate doit être antérieure à endDate",
+      });
+    }
+
+    const data = await analyticsService.getFleetUtilizationTrends({
+      startDate,
+      endDate,
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: data.length,
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getDriversEcoPerformance,
   getTiresHealthMatrix,
   getFinancialEnergetique,
+  getFleetUtilizationTrends,
 };
