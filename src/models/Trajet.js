@@ -63,7 +63,14 @@ const trajetSchema = new mongoose.Schema(
       enum: ["planifie", "en_cours", "termine", "annule"],
       default: "planifie",
     },
+    ordreMission: {
+      bucket: String,
+      s3Key: String,
+      sizeBytes: Number,
+      createdAt: Date,
+    },
   },
+
   {
     timestamps: true,
   },

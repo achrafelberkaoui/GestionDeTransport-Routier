@@ -4,6 +4,7 @@ const router = express.Router();
 const analyticsController = require("../../controllers/analyticsController");
 const authenticate = require("../../middleware/authMiddleware");
 const authorize = require("../../middleware/roleMiddleware");
+const genererOrdreMission = require("../../controllers/trajetController");
 
 router.get("/", (req, res) => {
   res.json({
@@ -35,6 +36,18 @@ router.get(
   authenticate,
   authorize("admin"),
   analyticsController.getFleetUtilizationTrends,
+);
+
+router.post(
+  "/trajets/:id/ordre-mission",
+  authenticate,
+  genererOrdreMission.genererOrdreMission,
+);
+
+router.get(
+  "/trajets/:id/ordre-mission/telecharger",
+  authenticate,
+  genererOrdreMission.telechargerOrdreMission,
 );
 
 module.exports = router;

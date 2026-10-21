@@ -1,6 +1,8 @@
 const trajetService = require("../services/trajetService");
 const pdfService = require("../services/pdfService");
 const Trajet = require("../models/Trajet");
+const { archiverOrdreMission } = require("../services/ordreMissionService");
+const { genererUrlTelechargement } = require("../services/storageService");
 
 // CREATE
 const createTrajet = async (req, res) => {
@@ -128,6 +130,73 @@ const telechargerPdfTrajet = async (req, res) => {
   }
 };
 
+const genererOrdreMission = async (req, res) => {
+  console.log("ooooooooo");
+  
+  try {
+    const { id } = req.params;
+
+    const trajet = await Trajet.findById(id)
+      .populate("camion")
+      .populate("remorque")
+      .populate("chauffeur");
+
+    if (!trajet) {
+      return res.status(404).json({
+        message: "Trajet introuvable",
+      });
+    }
+
+    const metadata = await archiverOrdreMission(trajet);
+
+    trajet.ordreMission = {
+      ...metadata,
+      createdAt: new Date(),
+    };
+
+    await trajet.save();
+
+    return res.status(201).json({
+      message: "Ordre de mission généré et archivé",
+      ordreMission: trajet.ordreMission,
+    });
+  } catch (error) {
+    console.error("Erreur ordre de mission :", error);
+
+    return res.status(500).json({
+      message: "Erreur lors de la génération de l'ordre de mission",
+    });
+  }
+};
+
+const telechargerOrdreMission = async (req, res) => {
+  try {
+    const trajet = await Trajet.findById(req.params.id);
+
+    if (!trajet) {
+      return res.status(404).json({
+        message: "Trajet introuvable",
+      });
+    }
+
+    if (!trajet.ordreMission?.s3Key) {
+      return res.status(404).json({
+        message: "Aucun ordre de mission archivé",
+      });
+    }
+
+    const url = await genererUrlTelechargement(trajet.ordreMission.s3Key);
+
+    return res.status(200).json({ url });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Impossible de générer le lien de téléchargement",
+    });
+  }
+};
+
 module.exports = {
   createTrajet,
   getAllTrajets,
@@ -135,4 +204,6 @@ module.exports = {
   updateTrajet,
   terminerTrajet,
   telechargerPdfTrajet,
+  genererOrdreMission,
+  telechargerOrdreMission,
 };

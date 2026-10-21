@@ -111,4 +111,23 @@ const genererPdfTrajet = (trajet) => {
   return doc;
 };
 
-module.exports = { genererPdfTrajet };
+const genererPdfTrajetBuffer = (trajet) => {
+  return new Promise((resolve, reject) => {
+    const doc = genererPdfTrajet(trajet);
+    const chunks = [];
+
+    doc.on("data", (chunk) => {
+      chunks.push(chunk);
+    });
+
+    doc.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+
+    doc.on("error", reject);
+
+    doc.end();
+  });
+};
+
+module.exports = { genererPdfTrajet, genererPdfTrajetBuffer };
