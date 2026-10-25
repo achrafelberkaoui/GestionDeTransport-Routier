@@ -1,14 +1,10 @@
+const { PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 
-const {
-  PutObjectCommand,
-  GetObjectCommand,
-} = require("@aws-sdk/client-s3");
-
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const presigner = require("@aws-sdk/s3-request-presigner");
 const s3Client = require("../config/S3");
 
 const BUCKET = process.env.S3_BUCKET || "fleettrack-documents";
-const URL_TTL = 15 * 60; 
+const URL_TTL = 15 * 60;
 
 const uploadPdf = async ({ key, buffer }) => {
   if (!key || !Buffer.isBuffer(buffer)) {
@@ -37,7 +33,7 @@ const genererUrlTelechargement = async (key) => {
     Key: key,
   });
 
-  return getSignedUrl(s3Client, command, {
+  return presigner.getSignedUrl(s3Client, command, {
     expiresIn: URL_TTL,
   });
 };

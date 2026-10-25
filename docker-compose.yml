@@ -16,6 +16,7 @@ services:
       - minio
 
   mongo:
+    container_name: mongo
     image: mongo:8
     ports:
       - "27017:27017"

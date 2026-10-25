@@ -1,10 +1,11 @@
 const express = require("express");
 
+const orderMissionRoutes = require("./orderMissionRoutes");
+const AnalyticsRoutes = require("./analyticsRoutes");
 const router = express.Router();
-const analyticsController = require("../../controllers/analyticsController");
-const authenticate = require("../../middleware/authMiddleware");
-const authorize = require("../../middleware/roleMiddleware");
-const genererOrdreMission = require("../../controllers/trajetController");
+
+router.use("/analytics", AnalyticsRoutes);
+router.use("/trajets", orderMissionRoutes);
 
 router.get("/", (req, res) => {
   res.json({
@@ -12,42 +13,5 @@ router.get("/", (req, res) => {
     version: "2.0",
   });
 });
-
-router.get(
-  "/analytics/drivers/eco-performance",
-  authenticate,
-  authorize("admin"),
-  analyticsController.getDriversEcoPerformance,
-);
-router.get(
-  "/analytics/tires/health-matrix",
-  authenticate,
-  authorize("admin"),
-  analyticsController.getTiresHealthMatrix,
-);
-router.get(
-  "/analytics/trips/financial-esg",
-  authenticate,
-  authorize("admin"),
-  analyticsController.getFinancialEnergetique,
-);
-router.get(
-  "/analytics/fleet/utilization-trends",
-  authenticate,
-  authorize("admin"),
-  analyticsController.getFleetUtilizationTrends,
-);
-
-router.post(
-  "/trajets/:id/ordre-mission",
-  authenticate,
-  genererOrdreMission.genererOrdreMission,
-);
-
-router.get(
-  "/trajets/:id/ordre-mission/telecharger",
-  authenticate,
-  genererOrdreMission.telechargerOrdreMission,
-);
 
 module.exports = router;

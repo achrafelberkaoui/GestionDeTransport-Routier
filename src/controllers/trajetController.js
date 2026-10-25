@@ -132,7 +132,7 @@ const telechargerPdfTrajet = async (req, res) => {
 
 const genererOrdreMission = async (req, res) => {
   console.log("ooooooooo");
-  
+
   try {
     const { id } = req.params;
 
@@ -176,6 +176,15 @@ const telechargerOrdreMission = async (req, res) => {
     if (!trajet) {
       return res.status(404).json({
         message: "Trajet introuvable",
+      });
+    }
+
+    const utilisateurId = req.user.id || req.user._id;
+    const chauffeurId = trajet.chauffeur.toString();
+
+    if (req.user.role !== "admin" && chauffeurId !== utilisateurId.toString()) {
+      return res.status(403).json({
+        message: "Accès interdit à cet ordre de mission",
       });
     }
 

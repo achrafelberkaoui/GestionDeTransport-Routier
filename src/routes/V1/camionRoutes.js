@@ -15,4 +15,3 @@ router.put("/:id", authenticate, authorize("admin"), validate(updateCamionSchema
 router.delete("/:id", authenticate, authorize("admin"), camionController.deleteCamion);
 
 module.exports = router;
-
