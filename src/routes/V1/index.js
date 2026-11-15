@@ -7,7 +7,6 @@ const remorqueRoutes = require("../V1/remorqueRoutes");
 const pneuRoutes = require("../V1/pneuRoutes");
 const trajetRoutes = require("../V1/trajetRoutes");
 const maintenanceRoutes = require("../V1/maintenanceRoutes");
-const rateAuthLimiter = require("../../middleware/rateAuthLimiteMiddleware");
 
 const router = express.Router();
 
@@ -17,7 +16,7 @@ router.get("/", (req, res) => {
     version: "1.0",
   });
 });
-router.use("/auth", rateAuthLimiter, authRoutes);
+router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
 router.use("/camions", camionRoutes);
 router.use("/remorques", remorqueRoutes);

@@ -2,16 +2,15 @@ const jwt = require("jsonwebtoken");
 
 const authenticate = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    // const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      return res.status(401).json({
-        message: "Authentication required",
-      });
-    }
+    // if (!authHeader) {
+    //   return res.status(401).json({
+    //     message: "Authentication required",
+    //   });
+    // }
 
-    const token = authHeader.split(" ")[1];
-
+    const token = req.cookies?.token;
     if (!token) {
       return res.status(401).json({
         message: "Token required",
@@ -22,11 +21,10 @@ const authenticate = async (req, res, next) => {
     req.user = decoded;
 
     next();
-
   } catch (error) {
-   return res.status(401).json({
-    message: "Invalid or expired token"
-   })
+    return res.status(401).json({
+      message: "Invalid or expired token",
+    });
   }
 };
 

@@ -131,7 +131,7 @@ const telechargerPdfTrajet = async (req, res) => {
 };
 
 const genererOrdreMission = async (req, res) => {
-  console.log("ooooooooo");
+  // console.log("ooooooooo");
 
   try {
     const { id } = req.params;

@@ -52,8 +52,8 @@ const verifierMaintenance = async (camionId) => {
   for (const maintenance of maintenances) {
     const kilometrageDepuisMaintenance =
       camion.kilometrage - maintenance.kilometrageDerniereMaintenance;
-      console.log(kilometrageDepuisMaintenance);
-      console.log(maintenance.seuilKilometrage);
+      // console.log(kilometrageDepuisMaintenance);
+      // console.log(maintenance.seuilKilometrage);
       
       
                     //150000                        //100
