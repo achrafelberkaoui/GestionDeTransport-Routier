@@ -34,6 +34,21 @@ const getAllTrajets = async (req, res) => {
     });
   }
 };
+// GET MES TRAJETS (CHAUFFEUR)
+const getMesTrajets = async (req, res) => {
+  try {
+    const trajets = await trajetService.getTrajetsByChauffeur(req.user.id);
+
+    res.status(200).json({
+      count: trajets.length,
+      trajets,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 // GET BY ID
 const getTrajetById = async (req, res) => {
@@ -215,4 +230,5 @@ module.exports = {
   telechargerPdfTrajet,
   genererOrdreMission,
   telechargerOrdreMission,
+  getMesTrajets,
 };

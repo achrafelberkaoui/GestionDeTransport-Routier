@@ -25,9 +25,15 @@ router.get(
   trajetController.getAllTrajets,
 );
 router.get(
+  "/mes-trajets",
+  authenticate,
+  authorize("driver"),
+  trajetController.getMesTrajets,
+);
+router.get(
   "/:id",
   authenticate,
-  authorize("driver","admin"),
+  authorize("driver", "admin"),
   trajetController.getTrajetById,
 );
 router.put(

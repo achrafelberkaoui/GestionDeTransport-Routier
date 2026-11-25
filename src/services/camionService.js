@@ -65,7 +65,7 @@ const getCamion = async (id) => {
 };
 
 const updateCamion = async (id, camionData) => {
-  const camion = Camion.findByIdAndUpdate(id, camionData, {
+  const camion = await Camion.findByIdAndUpdate(id, camionData, {
     new: true,
     runValidators: true,
   });

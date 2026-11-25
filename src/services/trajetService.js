@@ -24,7 +24,23 @@ const createTrajet = async (dataTrajet) => {
     statut: {
       $in: ["planifie", "en_cours"],
     },
-  });//checkDate
+  }); 
+  if (new Date(dateDepart).getTime() < Date.now()) {
+    
+    throw new Error("La date de départ ne peut pas être dans le passé");
+  }
+  const trajetChauffeurActif = await Trajet.findOne({
+    chauffeur,
+    statut: {
+      $in: ["planifie", "en_cours"],
+    },
+  });
+  console.log(trajetChauffeurActif);
+  
+
+  if (trajetChauffeurActif) {
+    throw new Error("Ce chauffeur possède déjà un trajet actif");
+  }
 
   if (trajetCamionActif) {
     throw new Error("Camion already has an active trajet");
@@ -103,6 +119,18 @@ const getTrajetById = async (id) => {
   }
 
   return trajet;
+};
+
+const getTrajetsByChauffeur = async (chauffeurId) => {
+  const trajets = await Trajet.find({
+    chauffeur: chauffeurId,
+  })
+    .populate("camion", "matricule marque modele statut")
+    .populate("remorque", "matricule type statut")
+    .populate("chauffeur", "nom email role statut")
+    .sort({ dateDepart: -1 });
+
+  return trajets;
 };
 
 const updateTrajet = async (id, dataTrajet) => {
@@ -200,5 +228,6 @@ module.exports = {
   getAllTrajets,
   getTrajetById,
   updateTrajet,
+  getTrajetsByChauffeur,
   terminerTrajet,
 };
